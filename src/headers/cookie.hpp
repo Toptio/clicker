@@ -9,17 +9,23 @@ class Cookie {
         ~Cookie();
         void Draw();
         void Update();
-        int GetCookieCount() const;
         void SetCookieCount(int count); 
-        int GetCookiePerClick() const;
+        int GetCookieCount() const;
         void SetCookiePerClick(int count);
+        int GetCookiePerClick() const;
+        void SetCookiePerSecond(int count);
+        int GetCookiePerSecond() const;
+        void reset();
     private:
         float x, y;
         float width, height,radius;
-        int cookiePerClick;
-        int cookieCount;
         int cookieState;
+        int cookieCount;
+        int cookiePerClick;
+        int cookiePerSecond;
         bool cookieClicked;
+        float timer;
+
         Sound clickSound;
         Texture2D cookie;
         Texture2D cookieHover;

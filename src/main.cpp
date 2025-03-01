@@ -1,5 +1,9 @@
 #include <raylib.h>
-#include <stdlib.h>
+#include <string>
+#include <iomanip>
+#include <sstream>
+
+// Include headers
 #include "headers/game_state.hpp"
 #include "headers/save.hpp"
 #include "headers/cookie.hpp"
@@ -8,6 +12,20 @@
 
 // Initial game state
 GameState gameState = GameState::MENU;
+
+// Function to format number
+std::string FormatNumber(int number) {
+    std::ostringstream oss;
+    if (number >= 1000000) {
+        oss << std::fixed << std::setprecision(1) << (number / 1000000.0) << "M";
+    } else if (number >= 1000) {
+        oss << std::fixed << std::setprecision(1) << (number / 1000.0) << "K";
+    } else {
+        oss << number;
+    }
+    return oss.str();
+}
+
 
 void UpdateQuit() {
     const char* text = "Are you sure you want to exit? Y/N";
@@ -39,16 +57,17 @@ void UpdateMenu() {
 }
 
 void UpdateGame(Cookie& cookie, Upgrades& upgrades) {
-    DrawText(TextFormat("Cookies: %d", cookie.GetCookieCount()), 10, 30, 20, WHITE);
+    std::string formattedCookies = FormatNumber(cookie.GetCookieCount());
+    DrawText(("Cookies: " + formattedCookies).c_str(), 10, 30, 20, WHITE);    
+    
     cookie.Draw(), cookie.Update();
     upgrades.Draw(), upgrades.Update(cookie);
+
     if(IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S)) {
-        SaveStorageValue(STORAGE_POSITION_SCORE, cookie.GetCookieCount());
+        saveGame(cookie);
     }
     if(IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_R)) {
-        int loadedscore = LoadStorageValue(STORAGE_POSITION_SCORE);
-        cookie.SetCookieCount(loadedscore);
-        TraceLog(LOG_INFO, "Loaded score: %d", loadedscore);
+        loadGame(cookie);
     }
     if(IsKeyPressed(KEY_ESCAPE)) {
         gameState = GameState::MENU;

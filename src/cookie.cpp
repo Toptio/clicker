@@ -4,15 +4,20 @@
 Cookie::Cookie() {
     x = GetScreenWidth() / 2;
     y = GetScreenHeight() / 2;
+
     cookie = LoadTexture("assets/cookies/perfectCookie.png");
     clickSound = LoadSound("assets/sound/click.mp3");
+
     width = 150;
     height = 150;
     radius = 50;
+
     cookieCount = 0;
     cookiePerClick = 1;
+    cookiePerSecond = 0;
     cookieClicked = false;
     cookieState = 0;
+    timer = 0.0f;
 }
 
 Cookie::~Cookie() {
@@ -48,7 +53,7 @@ void Cookie::Update() {
             cookieState = 2; // Pressed
             if(!cookieClicked) {
                 cookieClicked = true;
-                TraceLog(LOG_INFO, "Cookie Clicked");
+                //TraceLog(LOG_INFO, "Cookie Clicked");
             }
         } else {
             cookieState = 1; // Hover
@@ -61,6 +66,13 @@ void Cookie::Update() {
         cookieCount += cookiePerClick;
         cookieClicked = false;
         PlaySound(clickSound);
+    }
+
+    // Update cookie per second
+    timer += GetFrameTime();
+    if (timer >= 1.0f) {
+        cookieCount += cookiePerSecond;
+        timer = 0.0f;
     }
 }
 
@@ -78,4 +90,18 @@ void Cookie::SetCookiePerClick(int count) {
 
 int Cookie::GetCookiePerClick() const {
     return cookiePerClick;
+}
+
+void Cookie::SetCookiePerSecond(int count) {
+    cookiePerSecond = count;
+}
+
+int Cookie::GetCookiePerSecond() const {
+    return cookiePerSecond;
+}
+
+void Cookie::reset() {
+    cookieCount = 0;
+    cookiePerClick = 1;
+    cookiePerSecond = 0;
 }
