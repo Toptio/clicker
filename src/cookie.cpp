@@ -6,8 +6,8 @@ Cookie::Cookie() {
     y = GetScreenHeight() / 2;
     cookie = LoadTexture("assets/cookies/perfectCookie.png");
     clickSound = LoadSound("assets/sound/click.mp3");
-    width = 100;
-    height = 100;
+    width = 150;
+    height = 150;
     radius = 50;
     cookieCount = 0;
     cookiePerClick = 1;

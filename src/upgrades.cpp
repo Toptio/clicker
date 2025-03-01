@@ -1,33 +1,42 @@
 #include <raylib.h>
+#include "headers/game_state.hpp"
 #include "headers/upgrades.hpp"
+#include "headers/cookie.hpp"
 
 #define BUTTON_WIDTH 200
 #define BUTTON_HEIGHT 40
 #define POPUP_DURATION 2.0f
 
+extern GameState gameState;
+
 Upgrades::Upgrades() {
-
-    int screenWidth = GetScreenWidth();
-    int screenHeight = GetScreenHeight();
-
     btnState = 0;
+    btnState2 = 0;
+    btnState3 = 0;
     btnClicked = false;
+    btnClicked2 = false;
+    btnClicked3 = false;
     showPopup = false;
     popupTimer = 0.0f;
-
-    // Define panel
-    upgradesPanel = { (float)screenWidth - 240, 0, 240, (float)screenHeight };
-
-    // Define button
-    button = { (float)screenWidth - 230, 50, BUTTON_WIDTH, BUTTON_HEIGHT };}
+    popupText = "";
+}
 
 void Upgrades::Draw() {
     int screenWidth = GetScreenWidth();
+    int screenHeight = GetScreenHeight();
+
+    // Define panel
+    upgradesPanel = { (float)screenWidth - (screenWidth * 0.3f), 0, screenWidth * 0.3f, (float)screenHeight };
+
+    // Define buttons
+    button = { (float)screenWidth - (screenWidth * 0.3f) + 10, 50, BUTTON_WIDTH, BUTTON_HEIGHT };
+    button2 = { (float)screenWidth - (screenWidth * 0.3f) + 10, 100, BUTTON_WIDTH, BUTTON_HEIGHT }; 
+    button3 = { (float)screenWidth - (screenWidth * 0.3f) + 10, 150, BUTTON_WIDTH, BUTTON_HEIGHT };
 
     // Draw upgrades panel
     DrawRectangleRec(upgradesPanel, Fade(WHITE, 0.5f));
-    DrawText("Upgrades", screenWidth - 230, 10, 20, WHITE);
-    
+    DrawText("Upgrades", screenWidth - (screenWidth * 0.3f) + 10, 10, 20, WHITE);
+
     // Draw button
     Color color;
     switch(btnState) {
@@ -37,7 +46,30 @@ void Upgrades::Draw() {
     }
 
     DrawRectangleRec(button, color);
-    DrawText("Buy, +1 cookie", button.x + 10, button.y + 10, 20, BLACK);
+    DrawTextInButton("Buy, +1 cookie", button);
+
+    switch(btnState2) {
+        case 0: color = RED; break;
+        case 1: color = YELLOW; break;
+        case 2: color = WHITE; break;
+    }
+
+    DrawRectangleRec(button2, color);
+    DrawTextInButton("Double cookies per click", button2);
+
+    switch(btnState3) {
+        case 0: color = RED; break;
+        case 1: color = YELLOW; break;
+        case 2: color = WHITE; break;
+    }
+
+    DrawRectangleRec(button3, color);
+    DrawTextInButton("Win button", button3);
+
+    // Draw popup if visible
+    if (showPopup) {
+        DrawPopup(popupText);
+    }
 }
 
 void Upgrades::Update(Cookie& cookie) {
@@ -48,6 +80,7 @@ void Upgrades::Update(Cookie& cookie) {
             if (!btnClicked) {
                 btnClicked = true;
                 TraceLog(LOG_INFO, "Button Clicked");
+                CheckButtonClicked(cookie); // Call the new method when the button is clicked
             }
         } else {
             btnState = 1; // Hover
@@ -56,13 +89,50 @@ void Upgrades::Update(Cookie& cookie) {
         btnState = 0; // Normal
     }
 
+    if (CheckCollisionPointRec(mousePoint, button2)) {
+        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+            btnState2 = 2; // Pressed
+            if (!btnClicked2) {
+                btnClicked2 = true;
+                TraceLog(LOG_INFO, "Double Button Clicked");
+                CheckButtonDoubleClicked(cookie); // Call the new method when the button is clicked
+            }
+        } else {
+            btnState2 = 1; // Hover
+        }
+    } else {
+        btnState2 = 0; // Normal
+    }
+
+    if (CheckCollisionPointRec(mousePoint, button3)) {
+        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+            btnState3 = 2; // Pressed
+            if (!btnClicked3) {
+                btnClicked3 = true;
+                TraceLog(LOG_INFO, "Win Button Clicked");
+                CheckButtonWin(cookie); // Call the new method when the button is clicked
+            }
+        } else {
+            btnState3 = 1; // Hover
+        }
+    } else {
+        btnState3 = 0; // Normal
+    }
+
     if (btnClicked && IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-        CheckButtonClicked(cookie);
         btnClicked = false;
     }
 
+    if (btnClicked2 && IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+        btnClicked2 = false;
+    }
+
+    if (btnClicked3 && IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+        btnClicked3 = false;
+    }
+
+    // Update popup timer
     if (showPopup) {
-        DrawPopup();
         popupTimer -= GetFrameTime();
         if (popupTimer <= 0.0f) {
             showPopup = false;
@@ -71,25 +141,67 @@ void Upgrades::Update(Cookie& cookie) {
 }
 
 void Upgrades::CheckButtonClicked(Cookie& cookie) {
-    if (cookie.GetCookieCount() >= 10) {
-        cookie.SetCookieCount(cookie.GetCookieCount() - 10);
+    if (cookie.GetCookieCount() >= 100) {
+        cookie.SetCookieCount(cookie.GetCookieCount() - 100);
         cookie.SetCookiePerClick(cookie.GetCookiePerClick() + 1);
     } else {
         TraceLog(LOG_INFO, "Not enough cookies: %d", cookie.GetCookieCount());
-        TraceLog(LOG_INFO, "Need 10 cookies to buy upgrade");
+        TraceLog(LOG_INFO, "Need 100 cookies to buy upgrade");
+        popupText = "Not enough cookies! Need 100 cookies to buy upgrade";
         showPopup = true; // Show popup
         popupTimer = POPUP_DURATION; // Reset popup timer
     }
 }
 
-void Upgrades::DrawPopup() {
+void Upgrades::CheckButtonDoubleClicked(Cookie& cookie) {
+    if (cookie.GetCookieCount() >= 500) {
+        cookie.SetCookieCount(cookie.GetCookieCount() - 500);
+        cookie.SetCookiePerClick(cookie.GetCookiePerClick() * 2);
+    } else {
+        TraceLog(LOG_INFO, "Not enough cookies: %d", cookie.GetCookieCount());
+        TraceLog(LOG_INFO, "Need 500 cookies to buy upgrade");
+        popupText = "Not enough cookies! Need 500 cookies to buy upgrade";
+        showPopup = true; // Show popup
+        popupTimer = POPUP_DURATION; // Reset popup timer
+    }
+}
+
+void Upgrades::CheckButtonWin(Cookie& cookie) {
+    if (cookie.GetCookieCount() >= 10000) {
+        cookie.SetCookieCount(cookie.GetCookieCount() - 10000);
+        gameState = GameState::WIN;
+    } else {
+        TraceLog(LOG_INFO, "Not enough cookies: %d", cookie.GetCookieCount());
+        TraceLog(LOG_INFO, "Need 10000 cookies to buy upgrade");
+        popupText = "Not enough cookies! Need 10k cookies to buy upgrade";
+        showPopup = true; // Show popup
+        popupTimer = POPUP_DURATION; // Reset popup timer
+    }
+}
+
+void Upgrades::DrawPopup(const char* text) {
     int screenWidth = GetScreenWidth();
     int screenHeight = GetScreenHeight();
-    const char* message = "Not enough cookies! Need 10 cookies to buy upgrade.";
-    int textWidth = MeasureText(message, 20);
+    int textWidth = MeasureText(text, 20);
     int textX = (screenWidth - textWidth) / 2;
     int textY = screenHeight / 2;
 
     DrawRectangle(textX - 10, textY - 10, textWidth + 20, 40, Fade(BLACK, 0.8f));
-    DrawText(message, textX, textY, 20, WHITE);
+    DrawText(text, textX, textY, 20, WHITE);
+}
+
+void Upgrades::DrawTextInButton(const char* text, Rectangle button) {
+    int fontSize = 20;
+    int textWidth = MeasureText(text, fontSize);
+
+    // Adjust font size if text is too wide for the button
+    while (textWidth > button.width - 20 && fontSize > 10) {
+        fontSize--;
+        textWidth = MeasureText(text, fontSize);
+    }
+
+    int textX = button.x + (button.width - textWidth) / 2;
+    int textY = button.y + (button.height - fontSize) / 2;
+
+    DrawText(text, textX, textY, fontSize, BLACK);
 }

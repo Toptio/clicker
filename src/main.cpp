@@ -55,6 +55,21 @@ void UpdateGame(Cookie& cookie, Upgrades& upgrades) {
     }
 }
 
+void UpdateWin() {
+    int screenWidth = GetScreenWidth();
+    int screenHeight = GetScreenHeight();
+    int textWidth = MeasureText("You won! Press Enter to restart", 20);
+    int textX = (screenWidth - textWidth) / 2;
+    int textY = screenHeight / 2;
+    DrawText("You won! Press Enter to restart", textX, textY, 20, WHITE);
+    if (IsKeyPressed(KEY_ESCAPE)) {
+        gameState = GameState::MENU;
+    }
+    if (IsKeyPressed(KEY_ENTER)) {
+        gameState = GameState::GAME;
+    }
+}
+
 int main() {
     const int screenWidth = 800;
     const int screenHeight = 450;
@@ -62,7 +77,7 @@ int main() {
     InitWindow(screenWidth, screenHeight, "Cookie Clicker");
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
-    SetWindowState(FLAG_WINDOW_RESIZABLE);
+    //SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetWindowIcon(LoadImage("assets/icon/icon.png"));
 
     InitAudioDevice();
@@ -111,6 +126,9 @@ int main() {
                 case GameState::GAME:
                     UpdateGame(cookie, upgrades);
                     break;
+                case GameState::WIN:
+                    UpdateWin();
+                    break;  
                 case GameState::QUIT:
                     UpdateQuit();
                     break;
