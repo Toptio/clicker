@@ -45,6 +45,7 @@ bool SaveStorageValue(unsigned int position, int value) {
             RL_FREE(newFileData);
 
             TraceLog(LOG_INFO, "Saved data to file", STORAGE_DATA_FILE, position, value);
+            TraceLog(LOG_INFO, "Saved cookie count: %d", value);
         }
         else {
             TraceLog(LOG_WARNING, "Failed to load file data", STORAGE_DATA_FILE);
@@ -58,6 +59,7 @@ bool SaveStorageValue(unsigned int position, int value) {
             UnloadFileData(fileData);
 
             TraceLog(LOG_INFO, "Saved data to file", STORAGE_DATA_FILE, position, value);
+            TraceLog(LOG_INFO, "Saved cookie count: %d", value);
         }
 
         return success;

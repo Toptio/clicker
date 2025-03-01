@@ -10,6 +10,7 @@ Cookie::Cookie() {
     height = 100;
     radius = 50;
     cookieCount = 0;
+    cookiePerClick = 1;
     cookieClicked = false;
     cookieState = 0;
 }
@@ -42,10 +43,13 @@ void Cookie::Draw() {
 
 void Cookie::Update() {
     Vector2 mousePoint = GetMousePosition();
-    if (CheckCollisionPointCircle(mousePoint, {x, y}, radius)) {
-        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+    if(CheckCollisionPointCircle(mousePoint, {x, y}, radius)) {
+        if(IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
             cookieState = 2; // Pressed
-            cookieClicked = true;
+            if(!cookieClicked) {
+                cookieClicked = true;
+                TraceLog(LOG_INFO, "Cookie Clicked");
+            }
         } else {
             cookieState = 1; // Hover
         }
@@ -54,17 +58,24 @@ void Cookie::Update() {
     }
 
     if(cookieClicked == true && IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-        cookieCount++;
+        cookieCount += cookiePerClick;
         cookieClicked = false;
         PlaySound(clickSound);
     }
-}
-
-int Cookie::GetCookieCount() const {
-    return cookieCount;
 }
 
 void Cookie::SetCookieCount(int count) {
     cookieCount = count;
 }
 
+int Cookie::GetCookieCount() const {
+    return cookieCount;
+}
+
+void Cookie::SetCookiePerClick(int count) {
+    cookiePerClick = count;
+}
+
+int Cookie::GetCookiePerClick() const {
+    return cookiePerClick;
+}

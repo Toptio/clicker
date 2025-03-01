@@ -3,6 +3,7 @@
 #include "headers/game_state.hpp"
 #include "headers/save.hpp"
 #include "headers/cookie.hpp"
+#include "headers/upgrades.hpp"
 #include "headers/cursor.hpp"
 
 // Initial game state
@@ -37,17 +38,14 @@ void UpdateMenu() {
     }
 }
 
-void UpdateGame(Cookie& cookie) {
-    int screenWidth = GetScreenWidth();
-    int screenHeight = GetScreenHeight();
+void UpdateGame(Cookie& cookie, Upgrades& upgrades) {
     DrawText(TextFormat("Cookies: %d", cookie.GetCookieCount()), 10, 30, 20, WHITE);
-    cookie.Draw();
-    cookie.Update();
-    DrawRectangle(screenWidth - 100, 0, 100, screenHeight, Fade(WHITE, 0.5f));
-    if(IsKeyPressed(KEY_S)) {
+    cookie.Draw(), cookie.Update();
+    upgrades.Draw(), upgrades.Update(cookie);
+    if(IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S)) {
         SaveStorageValue(STORAGE_POSITION_SCORE, cookie.GetCookieCount());
     }
-    if(IsKeyPressed(KEY_R)) {
+    if(IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_R)) {
         int loadedscore = LoadStorageValue(STORAGE_POSITION_SCORE);
         cookie.SetCookieCount(loadedscore);
         TraceLog(LOG_INFO, "Loaded score: %d", loadedscore);
@@ -79,6 +77,7 @@ int main() {
     // Initialize game objects
     Cookie cookie;
     Cursor cursor;
+    Upgrades upgrades;
 
     // Hide cursor and set mouse position
     HideCursor();
@@ -110,7 +109,7 @@ int main() {
                     UpdateMenu();
                     break;
                 case GameState::GAME:
-                    UpdateGame(cookie);
+                    UpdateGame(cookie, upgrades);
                     break;
                 case GameState::QUIT:
                     UpdateQuit();

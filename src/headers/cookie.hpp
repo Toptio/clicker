@@ -9,13 +9,14 @@ class Cookie {
         ~Cookie();
         void Draw();
         void Update();
-        int GetCookieState() const;
         int GetCookieCount() const;
-        void SetCookieCount(int count);
-
+        void SetCookieCount(int count); 
+        int GetCookiePerClick() const;
+        void SetCookiePerClick(int count);
     private:
         float x, y;
         float width, height,radius;
+        int cookiePerClick;
         int cookieCount;
         int cookieState;
         bool cookieClicked;
