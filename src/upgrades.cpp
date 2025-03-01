@@ -13,11 +13,13 @@ Upgrades::Upgrades() {
     btnState = 0;
     btnState2 = 0;
     btnState3 = 0;
+    btnState4 = 0;
     btnWinState = 0;
 
     btnClicked = false;
     btnClicked2 = false;
     btnClicked3 = false;
+    btnClicked4 = false;
     btnWinClicked = false;
 
     showPopup = false;
@@ -36,6 +38,7 @@ void Upgrades::Draw() {
     button = { (float)screenWidth - (screenWidth * 0.3f) + 10, 50, BUTTON_WIDTH, BUTTON_HEIGHT };
     button2 = { (float)screenWidth - (screenWidth * 0.3f) + 10, 100, BUTTON_WIDTH, BUTTON_HEIGHT };
     button3 = { (float)screenWidth - (screenWidth * 0.3f) + 10, 150, BUTTON_WIDTH, BUTTON_HEIGHT }; 
+    button4 = { (float)screenWidth - (screenWidth * 0.3f) + 10, 200, BUTTON_WIDTH, BUTTON_HEIGHT };
     btnWin = { (float)screenWidth - (screenWidth * 0.3f) + 10, 400, BUTTON_WIDTH, BUTTON_HEIGHT };
 
     // Draw upgrades panel
@@ -70,6 +73,15 @@ void Upgrades::Draw() {
 
     DrawRectangleRec(button3, color);
     DrawTextInButton("+1 cookie per second", button3);
+
+    switch(btnState4) {
+        case 0: color = RED; break;
+        case 1: color = YELLOW; break;
+        case 2: color = WHITE; break;
+    }
+
+    DrawRectangleRec(button4, color);
+    DrawTextInButton("+4 cookiesper second", button4);
 
     switch(btnWinState) {
         case 0: color = RED; break;
@@ -133,6 +145,21 @@ void Upgrades::Update(Cookie& cookie) {
         btnState3 = 0; // Normal
     }
 
+    if (CheckCollisionPointRec(mousePoint, button4)) {
+        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+            btnState4 = 2; // Pressed
+            if (!btnClicked4) {
+                btnClicked4 = true;
+                //TraceLog(LOG_INFO, "Button Clicked");
+                CheckAutoButtonClicked2(cookie);
+            }
+        } else {
+            btnState4 = 1; // Hover
+        }
+    } else {
+        btnState4 = 0; // Normal
+    }
+
     if (CheckCollisionPointRec(mousePoint, btnWin)) {
         if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
             btnWinState = 2; // Pressed
@@ -164,6 +191,10 @@ void Upgrades::Update(Cookie& cookie) {
         btnWinClicked = false;
     }
 
+    if (btnClicked4 && IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+        btnClicked4 = false;
+    }
+
     // Update popup timer
     if (showPopup) {
         popupTimer -= GetFrameTime();
@@ -174,8 +205,8 @@ void Upgrades::Update(Cookie& cookie) {
 }
 
 void Upgrades::CheckButtonClicked(Cookie& cookie) {
-    if (cookie.GetCookieCount() >= 100) {
-        cookie.SetCookieCount(cookie.GetCookieCount() - 100);
+    if (cookie.GetCookieCount() >= 50) {
+        cookie.SetCookieCount(cookie.GetCookieCount() - 50);
         cookie.SetCookiePerClick(cookie.GetCookiePerClick() + 1);
         TraceLog(LOG_INFO, "Cookie per click is now: %d", cookie.GetCookiePerClick());
     } else {
@@ -210,6 +241,20 @@ void Upgrades::CheckAutoButtonClicked(Cookie& cookie) {
         TraceLog(LOG_INFO, "Not enough cookies: %d", cookie.GetCookieCount());
         TraceLog(LOG_INFO, "Need 200 cookies to buy upgrade");
         popupText = "Not enough cookies! Need 200 cookies to buy upgrade";
+        showPopup = true; // Show popup
+        popupTimer = POPUP_DURATION; // Reset popup timer
+    }
+}
+
+void Upgrades::CheckAutoButtonClicked2(Cookie& cookie) {
+    if (cookie.GetCookieCount() >= 400) {
+        cookie.SetCookieCount(cookie.GetCookieCount() - 400);
+        cookie.SetCookiePerSecond(cookie.GetCookiePerSecond() + 4);
+        TraceLog(LOG_INFO, "Cookie per second is now: %d", cookie.GetCookiePerSecond());
+    } else {
+        TraceLog(LOG_INFO, "Not enough cookies: %d", cookie.GetCookieCount());
+        TraceLog(LOG_INFO, "Need 200 cookies to buy upgrade");
+        popupText = "Not enough cookies! Need 400 cookies to buy upgrade";
         showPopup = true; // Show popup
         popupTimer = POPUP_DURATION; // Reset popup timer
     }

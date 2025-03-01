@@ -6,6 +6,7 @@
 // Include headers
 #include "headers/game_state.hpp"
 #include "headers/save.hpp"
+#include "headers/menu.hpp"
 #include "headers/cookie.hpp"
 #include "headers/upgrades.hpp"
 #include "headers/cursor.hpp"
@@ -41,19 +42,8 @@ void UpdateQuit() {
     }
 }
 
-void UpdateMenu() {
-    int screenWidth = GetScreenWidth();
-    int screenHeight = GetScreenHeight();
-    int textWidth = MeasureText("Press Enter to Start", 20);
-    int textX = (screenWidth - textWidth) / 2;
-    int textY = screenHeight / 2;
-    DrawText("Press Enter to Start", textX, textY, 20, WHITE);
-    if (IsKeyPressed(KEY_ENTER)) {
-        gameState = GameState::GAME;
-    }
-    if (IsKeyPressed(KEY_ESCAPE)) {
-        gameState = GameState::QUIT;
-    }
+void UpdateMenu(Menu& menu) {
+    menu.Draw(), menu.Update();
 }
 
 void UpdateGame(Cookie& cookie, Upgrades& upgrades) {
@@ -109,6 +99,7 @@ int main() {
     bool fullScreen = false;
 
     // Initialize game objects
+    Menu menu;
     Cookie cookie;
     Cursor cursor;
     Upgrades upgrades;
@@ -140,7 +131,7 @@ int main() {
             // Update game state
             switch(gameState) {
                 case GameState::MENU:
-                    UpdateMenu();
+                    UpdateMenu(menu);
                     break;
                 case GameState::GAME:
                     UpdateGame(cookie, upgrades);
