@@ -4,7 +4,7 @@
 Cookie::Cookie() {
     x = GetScreenWidth() / 2;
     y = GetScreenHeight() / 2;
-    texture = LoadTexture("assets/cookies/perfectCookie.png");
+    cookie = LoadTexture("assets/cookies/perfectCookie.png");
     clickSound = LoadSound("assets/sound/click.mp3");
     width = 100;
     height = 100;
@@ -15,7 +15,7 @@ Cookie::Cookie() {
 }
 
 Cookie::~Cookie() {
-    UnloadTexture(texture);
+    UnloadTexture(cookie);
     UnloadSound(clickSound);
 }
 
@@ -34,10 +34,10 @@ void Cookie::Draw() {
     } 
     DrawCircle(x, y, radius, color); */
 
-    Rectangle source = { 0.0f, 0.0f, (float)texture.width, (float)texture.height };
+    Rectangle source = { 0.0f, 0.0f, (float)cookie.width, (float)cookie.height };
     Rectangle dest = { x, y, width, height };
     Vector2 origin = { width / 2, height / 2 };
-    DrawTexturePro(texture, source, dest, origin, 0.0f, WHITE);
+    DrawTexturePro(cookie, source, dest, origin, 0.0f, WHITE);
 }
 
 void Cookie::Update() {

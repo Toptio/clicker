@@ -1,3 +1,7 @@
 *.exe
 *.dsym
+*.data
+.gitignore
+.gitattributes
 main
+save.data

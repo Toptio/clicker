@@ -20,7 +20,8 @@ class Cookie {
         int cookieState;
         bool cookieClicked;
         Sound clickSound;
-        Texture2D texture;
+        Texture2D cookie;
+        Texture2D cookieHover;
 };
 
 #endif
