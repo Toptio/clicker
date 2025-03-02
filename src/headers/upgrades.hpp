@@ -30,11 +30,8 @@ class Upgrades {
         float popupTimer;
         const char* popupText;
 
-        void CheckButtonClicked(Cookie& cookie);
-        void CheckButtonDoubleClicked(Cookie& cookie);
-        void CheckAutoButtonClicked(Cookie& cookie);
-        void CheckAutoButtonClicked2(Cookie& cookie);
-        void CheckButtonWin(Cookie& cookie);
+        void HandleButton(Rectangle button, int& btnState, bool& btnClicked, Cookie& cookie, int requiredCookies, const char* upgradeType, int upgradeAmount);
+        void CheckButtonClicked(Cookie& cookie, int requiredCookies, const char* upgradeType, int upgradeAmount);
         void DrawPopup(const char* text);
         void DrawTextInButton(const char* text, Rectangle button);
 };
