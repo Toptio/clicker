@@ -26,20 +26,6 @@ Cookie::~Cookie() {
 }
 
 void Cookie::Draw() {
-   /* Color color;
-    switch(cookieState){
-        case 0:
-            color = WHITE;
-            break;
-        case 1:
-            color = YELLOW;
-            break;
-        case 2:
-            color = RED;
-            break;
-    } 
-    DrawCircle(x, y, radius, color); */
-
     Rectangle source = { 0.0f, 0.0f, (float)cookie.width, (float)cookie.height };
     Rectangle dest = { x, y, width, height };
     Vector2 origin = { width / 2, height / 2 };

@@ -47,17 +47,21 @@ void UpdateMenu(Menu& menu) {
 }
 
 void UpdateGame(Cookie& cookie, Upgrades& upgrades) {
+    // Draw cookies
     std::string formattedCookies = FormatNumber(cookie.GetCookieCount());
     DrawText(("Cookies: " + formattedCookies).c_str(), 10, 30, 20, WHITE);    
+    // Draw cookies per second
+    std::string formattedCookiesPerSecond = FormatNumber(cookie.GetCookiePerSecond());
+    DrawText(("Cookies per second: " + formattedCookiesPerSecond).c_str(), 10, 60, 20, WHITE);
     
     cookie.Draw(), cookie.Update();
     upgrades.Draw(), upgrades.Update(cookie);
 
     if(IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S)) {
-        saveGame(cookie);
+        saveGame(cookie, upgrades);
     }
     if(IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_R)) {
-        loadGame(cookie);
+        loadGame(cookie, upgrades);
     }
     if(IsKeyPressed(KEY_ESCAPE)) {
         gameState = GameState::MENU;

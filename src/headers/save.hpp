@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include <stdlib.h>
 #include "cookie.hpp"
+#include "upgrades.hpp"
 
 #define STORAGE_DATA_FILE "save.data"
 
@@ -8,6 +9,7 @@ typedef enum {
     STORAGE_POSITION_SCORE = 0,
     STORAGE_POSITION_COOKIES_PER_CLICK = 1,
     STORAGE_POSITION_COOKIES_PER_SECOND = 2,
+    STORAGE_POSITION_REQUIRED_COOKIES = 3
 } StorageData;
 
 static bool SaveStorageValue(unsigned int position, int value);
@@ -81,26 +83,31 @@ int LoadStorageValue(unsigned int position) {
     return value;
 }
 
-void saveGame(Cookie& cookie) {
+void saveGame(Cookie& cookie, Upgrades& upgrades) {
     SaveStorageValue(STORAGE_POSITION_SCORE, cookie.GetCookieCount());
     SaveStorageValue(STORAGE_POSITION_COOKIES_PER_CLICK, cookie.GetCookiePerClick());
     SaveStorageValue(STORAGE_POSITION_COOKIES_PER_SECOND, cookie.GetCookiePerSecond());
+    SaveStorageValue(STORAGE_POSITION_REQUIRED_COOKIES, upgrades.GetRequiredCookies(0));
 
     TraceLog(LOG_INFO, "Saved cookie count: %d", cookie.GetCookieCount());
     TraceLog(LOG_INFO, "Saved cookie per click: %d", cookie.GetCookiePerClick());
     TraceLog(LOG_INFO, "Saved cookie per second: %d", cookie.GetCookiePerSecond());
+    TraceLog(LOG_INFO, "Saved required cookies for upgrade");
 }
 
-void loadGame(Cookie& cookie) {
+void loadGame(Cookie& cookie, Upgrades& upgrades) {
     int loadedScore = LoadStorageValue(STORAGE_POSITION_SCORE);
     int loadedCookiePerClick = LoadStorageValue(STORAGE_POSITION_COOKIES_PER_CLICK);
     int loadedCookiePerSecond = LoadStorageValue(STORAGE_POSITION_COOKIES_PER_SECOND);
+    int loadedRequiredCookies = LoadStorageValue(STORAGE_POSITION_REQUIRED_COOKIES);
 
     cookie.SetCookieCount(loadedScore);
     cookie.SetCookiePerClick(loadedCookiePerClick);
     cookie.SetCookiePerSecond(loadedCookiePerSecond);
+    upgrades.SetRequiredCookies(0, loadedRequiredCookies);
 
     TraceLog(LOG_INFO, "Loaded cookie count: %d", loadedScore);
     TraceLog(LOG_INFO, "Loaded cookie per click: %d", loadedCookiePerClick);
     TraceLog(LOG_INFO, "Loaded cookie per second: %d", loadedCookiePerSecond);
+    TraceLog(LOG_INFO, "Loaded required cookies for upgrade");
 }
