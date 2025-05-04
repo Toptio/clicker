@@ -15,17 +15,23 @@ Upgrades::Upgrades() {
     int screenWidth = GetScreenWidth();
 
     // Initialize buttons
-    buttons.push_back({{(float)screenWidth - (screenWidth * 0.3f) + 10, 50, BUTTON_WIDTH, BUTTON_HEIGHT}, 0, false, "+1 cookie per click", 50, "click", 1});
-    buttons.push_back({{(float)screenWidth - (screenWidth * 0.3f) + 10, 100, BUTTON_WIDTH, BUTTON_HEIGHT}, 0, false, "+15 cookies per click", 500, "click", 15});
-    buttons.push_back({{(float)screenWidth - (screenWidth * 0.3f) + 10, 150, BUTTON_WIDTH, BUTTON_HEIGHT}, 0, false, "+1 cookie per second", 100, "second", 1});
-    buttons.push_back({{(float)screenWidth - (screenWidth * 0.3f) + 10, 200, BUTTON_WIDTH, BUTTON_HEIGHT}, 0, false, "+5 cookies per second", 350, "second", 5});
-    buttons.push_back({{(float)screenWidth - (screenWidth * 0.3f) + 10, 400, BUTTON_WIDTH, BUTTON_HEIGHT}, 0, false, "Win button", 1000000, "win", 0});
+    buttons.push_back({{(float)screenWidth - (screenWidth * 0.3f) + 10, 50, BUTTON_WIDTH, BUTTON_HEIGHT}, 0, false, "+1 cookie per second", 50, "second", 1, 50, 0.5f});
+    buttons.push_back({{(float)screenWidth - (screenWidth * 0.3f) + 10, 100, BUTTON_WIDTH, BUTTON_HEIGHT}, 0, false, "+10 cookies per second", 300, "second", 10, 300, 0.5f});
+    buttons.push_back({{(float)screenWidth - (screenWidth * 0.3f) + 10, 150, BUTTON_WIDTH, BUTTON_HEIGHT}, 0, false, "+100 cookie per second", 850, "second", 100, 850, 0.5f});
+    buttons.push_back({{(float)screenWidth - (screenWidth * 0.3f) + 10, 200, BUTTON_WIDTH, BUTTON_HEIGHT}, 0, false, "+500 cookies per second", 1500, "second", 500, 1500, 0.5f});
 
+    // Shop buttons
+    buttons.push_back({{(float)screenWidth - (screenWidth * 0.3f) + 10, 300, BUTTON_WIDTH, BUTTON_HEIGHT}, 0, false, "+50 cookies per click", 500, "click", 50, 500, 0.5f});
+    buttons.push_back({{(float)screenWidth - (screenWidth * 0.3f) + 10, 350, BUTTON_WIDTH, BUTTON_HEIGHT}, 0, false, "+100 cookies per click", 1000, "click", 100, 1000, 0.5f});
+    buttons.push_back({{(float)screenWidth - (screenWidth * 0.3f) + 10, 450, BUTTON_WIDTH, BUTTON_HEIGHT}, 0, false, "+250 cookies per click", 2500, "click", 250, 2500, 0.5f});
+    buttons.push_back({{(float)screenWidth - (screenWidth * 0.3f) + 10, 400, BUTTON_WIDTH, BUTTON_HEIGHT}, 0, false, "Win button", 1000000, "win", 0, 1000000, 2.2f});
+ 
     // Initialize other members
     showPopup = false;
     popupTimer = 0.0f;
     popupText = nullptr;
-    
+    winCount = 0;
+    currentLevel = 1;
 }
 
 void Upgrades::Draw() {
@@ -38,6 +44,10 @@ void Upgrades::Draw() {
     // Draw upgrades panel
     DrawRectangleRec(upgradesPanel, Fade(WHITE, 0.5f));
     DrawText("Upgrades", screenWidth - (screenWidth * 0.3f) + 10, 10, 20, WHITE);
+
+    // Draw Shop Text
+    DrawText("Shop", screenWidth - (screenWidth * 0.3f) + 10, 250, 20, WHITE);
+
 
    // Draw buttons
    for (const auto& button : buttons) {
@@ -55,6 +65,22 @@ void Upgrades::Draw() {
     if (showPopup) {
         DrawPopup(popupText);
     }
+
+}
+
+void Upgrades::Draw2(){
+    int screenWidth = GetScreenWidth();
+    int screenHeight = GetScreenHeight();
+
+    // Define panel
+    upgradesPanel = { (float)screenWidth - (screenWidth * 0.3f), 0, screenWidth * 0.3f, (float)screenHeight };
+
+    // Draw upgrades panel
+    DrawRectangleRec(upgradesPanel, Fade(WHITE, 0.5f));
+    DrawText("Upgrades", screenWidth - (screenWidth * 0.3f) + 10, 10, 20, WHITE);
+
+    // Draw Shop Text
+    DrawText("Shop", screenWidth - (screenWidth * 0.3f) + 10, 250, 20, WHITE);
 }
 
 void Upgrades::Update(Cookie& cookie) {
@@ -71,6 +97,7 @@ void Upgrades::Update(Cookie& cookie) {
             showPopup = false;
         }
     }
+
 }
 
 void Upgrades::HandleButton(Button& button, Cookie& cookie) {
@@ -107,9 +134,26 @@ void Upgrades::CheckButtonClicked(Button& button, Cookie& cookie) {
             cookie.SetCookiePerSecond(cookie.GetCookiePerSecond() + button.upgradeAmount);
             TraceLog(LOG_INFO, "Cookie per second is now: %d", cookie.GetCookiePerSecond());
         } else if (strcmp(button.upgradeType, "win") == 0) {
-            cookie.reset();
+            cookie.Reset();
+            void ResetUpgrades();
+            winCount++;
+            TraceLog(LOG_INFO, "Win count: %d", winCount);
+            
+            // Check if player should level up
+            if (winCount >= 2 * currentLevel) {
+                currentLevel++;
+                winCount = 0;
+                TraceLog(LOG_INFO, "Level up! Current level: %d", currentLevel);
+                popupText = TextFormat("Level up! You are now level %d!", currentLevel);
+                showPopup = true;
+                popupTimer = POPUP_DURATION;
+            }
+            
             gameState = GameState::WIN;
         }
+        // Mark button as purchased
+        //button.purchased = true;
+
         // Increase price for next upgrade
         button.requiredCookies = static_cast<int>(button.requiredCookies * button.priceMultiplier);
     } else {
@@ -133,6 +177,14 @@ int Upgrades::GetRequiredCookies(int index) const {
         return buttons[index].requiredCookies;
     }
     return -1; // Return -1 if index is out of range
+}
+
+void Upgrades::SetWinCount(int count) {
+    winCount = count;
+}
+
+int Upgrades::GetWinCount() const{
+    return winCount;
 }
 
 void Upgrades::DrawPopup(const char* text) {
@@ -160,4 +212,18 @@ void Upgrades::DrawTextInButton(const char* text, Rectangle button) {
     int textY = button.y + (button.height - fontSize) / 2;
 
     DrawText(text, textX, textY, fontSize, BLACK);
+}
+
+void Upgrades::ResetUpgrades() {
+    for (auto& button : buttons) {
+        button.requiredCookies = button.initalRequiredCookies;
+    }
+}
+
+void Upgrades::SetCurrentLevel(int level) {
+    currentLevel = level;
+}
+
+int Upgrades::GetCurrentLevel() const {
+    return currentLevel;
 }

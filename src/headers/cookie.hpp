@@ -17,7 +17,7 @@ class Cookie {
         void SetCookiePerSecond(int count);
         int GetCookiePerSecond() const;
 
-        void reset();
+        void Reset();
     private:
         float x, y;
         float width, height,radius;

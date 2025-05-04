@@ -66,5 +66,6 @@
 		"cstring": "cpp",
 		"fstream": "cpp",
 		"sstream": "cpp"
-	}
+	},
+	"CodeGPT.apiKey": "CodeGPT Plus Beta"
 }

@@ -9,7 +9,9 @@ typedef enum {
     STORAGE_POSITION_SCORE = 0,
     STORAGE_POSITION_COOKIES_PER_CLICK = 1,
     STORAGE_POSITION_COOKIES_PER_SECOND = 2,
-    STORAGE_POSITION_REQUIRED_COOKIES = 3
+    STORAGE_POSITION_REQUIRED_COOKIES = 3,
+    STORAGE_POSITION_WIN_COUNT = 4,
+    STORAGE_POSITION_CURRENT_LEVEL = 5
 } StorageData;
 
 static bool SaveStorageValue(unsigned int position, int value);
@@ -84,30 +86,50 @@ int LoadStorageValue(unsigned int position) {
 }
 
 void saveGame(Cookie& cookie, Upgrades& upgrades) {
+    if (cookie.GetCookieCount() == 0) {
+        TraceLog(LOG_WARNING, "Cookie count is 0, cannot save game");
+        return;
+    }
+   
+    int winCount = upgrades.GetWinCount();
+    if (winCount < 0) {
+        winCount = 0;
+    }
+
     SaveStorageValue(STORAGE_POSITION_SCORE, cookie.GetCookieCount());
     SaveStorageValue(STORAGE_POSITION_COOKIES_PER_CLICK, cookie.GetCookiePerClick());
     SaveStorageValue(STORAGE_POSITION_COOKIES_PER_SECOND, cookie.GetCookiePerSecond());
     SaveStorageValue(STORAGE_POSITION_REQUIRED_COOKIES, upgrades.GetRequiredCookies(0));
+    SaveStorageValue(STORAGE_POSITION_WIN_COUNT, upgrades.GetWinCount());
+    SaveStorageValue(STORAGE_POSITION_CURRENT_LEVEL, upgrades.GetCurrentLevel());
 
     TraceLog(LOG_INFO, "Saved cookie count: %d", cookie.GetCookieCount());
     TraceLog(LOG_INFO, "Saved cookie per click: %d", cookie.GetCookiePerClick());
     TraceLog(LOG_INFO, "Saved cookie per second: %d", cookie.GetCookiePerSecond());
     TraceLog(LOG_INFO, "Saved required cookies for upgrade");
-}
+    TraceLog(LOG_INFO, "Saved win count: %d", upgrades.GetWinCount());
+    TraceLog(LOG_INFO, "Saved current level: %d", upgrades.GetCurrentLevel());
+}   
 
 void loadGame(Cookie& cookie, Upgrades& upgrades) {
     int loadedScore = LoadStorageValue(STORAGE_POSITION_SCORE);
     int loadedCookiePerClick = LoadStorageValue(STORAGE_POSITION_COOKIES_PER_CLICK);
     int loadedCookiePerSecond = LoadStorageValue(STORAGE_POSITION_COOKIES_PER_SECOND);
     int loadedRequiredCookies = LoadStorageValue(STORAGE_POSITION_REQUIRED_COOKIES);
+    int loadedWinCount = LoadStorageValue(STORAGE_POSITION_WIN_COUNT);
+    int loadedCurrentLevel = LoadStorageValue(STORAGE_POSITION_CURRENT_LEVEL);
 
     cookie.SetCookieCount(loadedScore);
     cookie.SetCookiePerClick(loadedCookiePerClick);
     cookie.SetCookiePerSecond(loadedCookiePerSecond);
     upgrades.SetRequiredCookies(0, loadedRequiredCookies);
+    upgrades.SetWinCount(loadedWinCount);
+    upgrades.SetCurrentLevel(loadedCurrentLevel);
 
     TraceLog(LOG_INFO, "Loaded cookie count: %d", loadedScore);
     TraceLog(LOG_INFO, "Loaded cookie per click: %d", loadedCookiePerClick);
     TraceLog(LOG_INFO, "Loaded cookie per second: %d", loadedCookiePerSecond);
     TraceLog(LOG_INFO, "Loaded required cookies for upgrade");
+    TraceLog(LOG_INFO, "Loaded win count: %d", loadedWinCount);
+    TraceLog(LOG_INFO, "Loaded current level: %d", loadedCurrentLevel);
 }

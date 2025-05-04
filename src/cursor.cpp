@@ -3,7 +3,7 @@
 
 Cursor::Cursor() {
     normaltexture = LoadTexture("assets/cursors/cursor.png");
-    clicktexture = LoadTexture("assets/cursors/cursor2.png");
+    clicktexture = LoadTexture("assets/cursors/cursor2.png"); 
 }
 
 Cursor::~Cursor() {

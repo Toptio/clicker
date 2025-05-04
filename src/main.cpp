@@ -46,6 +46,14 @@ void UpdateMenu(Menu& menu) {
     menu.Draw(), menu.Update();
 }
 
+void UpdatePause() {
+    const char* text = "Game Paused";
+    int textWidth = MeasureText(text, 20);
+    int textX = GetScreenWidth() / 2 - textWidth / 2;
+    int textY = GetScreenHeight() / 2;
+    DrawText(text, textX, textY, 20, WHITE);
+}
+
 void UpdateGame(Cookie& cookie, Upgrades& upgrades) {
     // Draw cookies
     std::string formattedCookies = FormatNumber(cookie.GetCookieCount());
@@ -53,6 +61,9 @@ void UpdateGame(Cookie& cookie, Upgrades& upgrades) {
     // Draw cookies per second
     std::string formattedCookiesPerSecond = FormatNumber(cookie.GetCookiePerSecond());
     DrawText(("Cookies per second: " + formattedCookiesPerSecond).c_str(), 10, 60, 20, WHITE);
+    // Draw cookies per click
+    std::string formattedCookiesPerClick = FormatNumber(cookie.GetCookiePerClick());
+    DrawText(("Cookies per click: " + formattedCookiesPerClick).c_str(), 10, 90, 20, WHITE);
     
     cookie.Draw(), cookie.Update();
     upgrades.Draw(), upgrades.Update(cookie);
@@ -139,6 +150,9 @@ int main() {
                     break;
                 case GameState::GAME:
                     UpdateGame(cookie, upgrades);
+                    break;
+                case GameState::PAUSE:
+                    UpdatePause();
                     break;
                 case GameState::WIN:
                     UpdateWin();

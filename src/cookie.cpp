@@ -86,7 +86,7 @@ int Cookie::GetCookiePerSecond() const {
     return cookiePerSecond;
 }
 
-void Cookie::reset() {
+void Cookie::Reset() {
     cookieCount = 0;
     cookiePerClick = 1;
     cookiePerSecond = 0;
