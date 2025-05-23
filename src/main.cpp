@@ -4,29 +4,17 @@
 #include <sstream>
 
 // Include headers
+#include "headers/helper.hpp"
 #include "headers/game_state.hpp"
 #include "headers/save.hpp"
 #include "headers/menu.hpp"
+#include "headers/options.hpp"
 #include "headers/cookie.hpp"
 #include "headers/upgrades.hpp"
 #include "headers/cursor.hpp"
 
 // Initial game state
 GameState gameState = GameState::MENU;
-
-// Function to format number
-std::string FormatNumber(int number) {
-    std::ostringstream oss;
-    if (number >= 1000000) {
-        oss << std::fixed << std::setprecision(1) << (number / 1000000.0) << "M";
-    } else if (number >= 1000) {
-        oss << std::fixed << std::setprecision(1) << (number / 1000.0) << "K";
-    } else {
-        oss << number;
-    }
-    return oss.str();
-}
-
 
 void UpdateQuit() {
     const char* text = "Are you sure you want to exit? Y/N";
@@ -44,14 +32,6 @@ void UpdateQuit() {
 
 void UpdateMenu(Menu& menu) {
     menu.Draw(), menu.Update();
-}
-
-void UpdatePause() {
-    const char* text = "Game Paused";
-    int textWidth = MeasureText(text, 20);
-    int textX = GetScreenWidth() / 2 - textWidth / 2;
-    int textY = GetScreenHeight() / 2;
-    DrawText(text, textX, textY, 20, WHITE);
 }
 
 void UpdateGame(Cookie& cookie, Upgrades& upgrades) {
@@ -148,11 +128,10 @@ int main() {
                 case GameState::MENU:
                     UpdateMenu(menu);
                     break;
+                case GameState::OPTIONS:
+                    break;
                 case GameState::GAME:
                     UpdateGame(cookie, upgrades);
-                    break;
-                case GameState::PAUSE:
-                    UpdatePause();
                     break;
                 case GameState::WIN:
                     UpdateWin();
